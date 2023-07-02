@@ -12,64 +12,42 @@ const connection = mysql.createConnection({
     database: 'paseo',
 });
 
-// Conéctate a la base de datos
-connection.connect((err) => {
-    if (err) {
-        console.error('Error al conectar a la base de datos: ', err);
-    } else {
-        console.log('Conexión exitosa a la base de datos');
-    }
-});
-
-// Define una ruta para obtener datos de la base de datos
-app.get('/data', (req, res) => {
-    // Realiza una consulta a la base de datos
-    connection.query('SELECT * FROM datos_personales_formulario', (err, results) => {
-        const {
-            Numero_documento,
-            nombre,
-            Apellido_paterno,
-            Apellido_materno,
-            sexo,
-            fecha,
-            correo,
-            Numero_celular,
-            Direccion,
-            departamento,
-            provincia,
-            distrito
-        } = req.query;
-
-        const sql = `INSERT INTO datos_personales_formulario (Numero_documento, nombre, Apellido_paterno, Apellido_materno, sexo, fecha, correo, Numero_celular, Direccion, departamento, provincia, distrito) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-        connection.query(
-            sql,
-            [
-                Numero_documento,
-                nombre,
-                Apellido_paterno,
-                Apellido_materno,
-                sexo,
-                fecha,
-                correo,
-                Numero_celular,
-                Direccion,
-                departamento,
-                provincia,
-                distrito
-            ],
-            (err, result) => {
-                if (err) {
-                    console.error('Error al ejecutar la consulta: ', err);
-                    res.status(500).json({ error: 'Error al insertar los datos en la base de datos' });
-                } else {
-                    res.json({ message: 'Datos insertados correctamente' });
-                }
-            }
-        )
+app.get('/departamentos', (req, res) => {
+    connection.query('SELECT * FROM departamentos  ' , (error, results) => {
+        if (error) {
+            console.error('Error al obtener los departamentos: ', error);
+            res.status(500).json({ error: 'Error al obtener los departamentos' });
+        } else {
+            res.json(results);
+        }
     });
 });
 
-// Inicia el servidor
-app.listen(port, () => {
-    console.log(`Servidor backend en ejecución en http://localhost:${port}`);
+// Ruta para obtener las provincias
+app.get('/provincias', (req, res) => {
+    connection.query('SELECT * FROM provincias', (error, results) => {
+        if (error) {
+            console.error('Error al obtener las provincias: ', error);
+            res.status(500).json({ error: 'Error al obtener las provincias' });
+        } else {
+            res.json(results);
+        }
+    });
+});
+
+// Ruta para obtener los distritos
+app.get('/distritos', (req, res) => {
+    connection.query('SELECT * FROM distritos ', (error, results) => {
+        if (error) {
+            console.error('Error al obtener los distritos: ', error);
+            res.status(500).json({ error: 'Error al obtener los distritos' });
+        } else {
+            res.json(results);
+        }
+    });
+});
+
+// Iniciar el servidor
+app.listen(3001, () => {
+    console.log('Servidor iniciado en el puerto 3001');
 });

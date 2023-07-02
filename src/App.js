@@ -7,6 +7,25 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 
 const App = () => {
 
+	const [departamentos, setDepartamentos] = useState([]);
+	const [provincias, setProvincias] = useState([]);
+	const [distritos, setDistritos] = useState([]);
+
+	useEffect(() => {
+		obtenerDatos();
+	}, []);
+
+
+	const obtenerDatos = async () => {
+		try {
+			const response = await axios.get('http://localhost:3001/departamentos');
+			setDepartamentos(response.data);
+		} catch (error) {
+			console.error(error);
+		}
+		
+	};
+
 	const handleSubmit = (values) => {
 		axios.post('http://localhost:3001/data', values)
 			.then((response) => {
@@ -19,37 +38,9 @@ const App = () => {
 			});
 	};
 
-	const [data, setData] = useState([]);
-
-	useEffect(() => {
-		// Realiza la solicitud HTTP al servidor backend
-		axios.get('http://localhost:3001/data')
-			.then((response) => {
-				setData(response.data);
-			})
-			.catch((error) => {
-				console.error('Error al obtener los datos: ', error);
-			});
-	}, []);
-
 	const [formularioEnviado, cambiarFormularioEnviado] = useState(false);
-	const wrapper = document.querySelector(".wrapper");
-	const selectBtn = wrapper?.querySelector(".select-btn");
-	const options = wrapper?.querySelector(".options");
-	let departamentos = ["arequipa", "lima", "piura"]
 
-	function addDepartamentos() {
-		departamentos.forEach(departamentos => {
-			let li = '<li>${departamentos}</li>';
-			options.insertAdjacentHTML("beforeend", li);
-		})
-	}
 
-	if (wrapper && selectBtn) {
-		selectBtn.addEventListener("click", () => {
-			wrapper.classList.toggle("active");
-		});
-	}
 	return (
 		<>
 			<div className='contenedor'>
@@ -120,8 +111,8 @@ const App = () => {
 						console.log('Formulario enviado');
 						cambiarFormularioEnviado(true);
 						setTimeout(() => cambiarFormularioEnviado(false), 5000);
-					  }}
-					
+					}}
+
 				>
 					{({ errors }) => (
 						<Form className="formulario">
@@ -216,31 +207,34 @@ const App = () => {
 								/>
 								<ErrorMessage name="Direccion" component={() => (<div className="error">{errors.Direccion}</div>)} />
 							</div>
-
 							<div>
 								<label htmlFor="nombre">Departamento</label>
-								<Field name="departamento" as="select">
-									<option value="arequipa">Arequipa</option>
-								</Field>
+								<select name="departamento" className="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+									<option selected>-- departamentos --</option>
+									{departamentos.map((departamento) => (
+										<option key={departamento.id} value={departamento.id}>{departamento.nombre}</option>
+									))}
+									
+								</select>
 							</div>
+
 							<div>
 								<label htmlFor="nombre">Provincia</label>
-								<Field name="provincia" as="select">
-									<option value="arequipa">Arequipa</option>
-
-								</Field>
+								<select name="provincia" className="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+									<option selected>-- provincia --</option>
+									
+								</select>
 							</div>
+
 							<div>
 								<label htmlFor="nombre">Distrito</label>
-								<Field name="distrito" as="select">
-									<option value="arequipa">Arequipa</option>
-								</Field>
+								<select name="distrito" className="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+									<option selected>-- distrito --</option>
+									
+								</select>
 							</div>
 
 							<button type="submit" onClick={handleSubmit}>Crear Cuenta</button>
-
-
-
 
 
 							{formularioEnviado && <p className="exito">Formulario enviado con exito!</p>}
