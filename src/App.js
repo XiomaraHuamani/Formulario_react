@@ -1,30 +1,41 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import './App.css';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 
 //import FormInput from "./components/FormInput";
 
 const App = () => {
-	const mysql = require('mysql');
-	const connection = mysql.createConnection({
-		host: 'localhost', // Cambia esto por la dirección de tu servidor MySQL
-		user: 'root', // Cambia esto por tu nombre de usuario de MySQL
-		password: '', // Cambia esto por tu contraseña de MySQL
-		database: 'datos_personales_formulario' // Cambia esto por el nombre de tu base de datos
-	});
 
-	conexion.connect(function(error){
-		if(!!error){
-			console.log('error de connexion', error.stack);
-			return;
-		}
-		console.log("conectado",conexion.threadId);
-	})
+	const handleSubmit = (values) => {
+		axios.post('http://localhost:3001/data', values)
+			.then((response) => {
+				console.log('Formulario enviado');
+				cambiarFormularioEnviado(true);
+				setTimeout(() => cambiarFormularioEnviado(false), 5000);
+			})
+			.catch((error) => {
+				console.error('Error al enviar los datos del formulario: ', error);
+			});
+	};
+
+	const [data, setData] = useState([]);
+
+	useEffect(() => {
+		// Realiza la solicitud HTTP al servidor backend
+		axios.get('http://localhost:3001/data')
+			.then((response) => {
+				setData(response.data);
+			})
+			.catch((error) => {
+				console.error('Error al obtener los datos: ', error);
+			});
+	}, []);
 
 	const [formularioEnviado, cambiarFormularioEnviado] = useState(false);
 	const wrapper = document.querySelector(".wrapper");
 	const selectBtn = wrapper?.querySelector(".select-btn");
-	const options = wrapper?.querySelector(".options"); 
+	const options = wrapper?.querySelector(".options");
 	let departamentos = ["arequipa", "lima", "piura"]
 
 	function addDepartamentos() {
@@ -109,7 +120,8 @@ const App = () => {
 						console.log('Formulario enviado');
 						cambiarFormularioEnviado(true);
 						setTimeout(() => cambiarFormularioEnviado(false), 5000);
-					}}
+					  }}
+					
 				>
 					{({ errors }) => (
 						<Form className="formulario">
@@ -156,7 +168,7 @@ const App = () => {
 								<ErrorMessage name="Apellido_materno" component={() => (<div className="error">{errors.Apellido_materno}</div>)} />
 							</div>
 							<div>
-							<label htmlFor="genero">Genero</label>
+								<label htmlFor="genero">Genero</label>
 								<label>
 									<Field type="radio" name="sexo" value="hombre" /> Hombre
 								</label>
@@ -206,28 +218,28 @@ const App = () => {
 							</div>
 
 							<div>
-							<label htmlFor="nombre">Departamento</label>
+								<label htmlFor="nombre">Departamento</label>
 								<Field name="departamento" as="select">
-								<option value="arequipa">Arequipa</option>
+									<option value="arequipa">Arequipa</option>
 								</Field>
 							</div>
 							<div>
-							<label htmlFor="nombre">Provincia</label>
+								<label htmlFor="nombre">Provincia</label>
 								<Field name="provincia" as="select">
 									<option value="arequipa">Arequipa</option>
-									
+
 								</Field>
 							</div>
 							<div>
-							<label htmlFor="nombre">Distrito</label>
+								<label htmlFor="nombre">Distrito</label>
 								<Field name="distrito" as="select">
-								<option value="arequipa">Arequipa</option>
+									<option value="arequipa">Arequipa</option>
 								</Field>
 							</div>
 
+							<button type="submit" onClick={handleSubmit}>Crear Cuenta</button>
 
 
-							<button type="submit">Crear Cuenta</button>
 
 
 
