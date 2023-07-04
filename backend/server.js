@@ -12,42 +12,18 @@ const connection = mysql.createConnection({
     database: 'paseo',
 });
 
-app.get('/departamentos', (req, res) => {
-    connection.query('SELECT * FROM departamentos  ' , (error, results) => {
+app.get('/api/datos_personales', (req, res) => {
+    connection.query('SELECT * FROM datos_personales_formulario', (error, results) => {
         if (error) {
-            console.error('Error al obtener los departamentos: ', error);
-            res.status(500).json({ error: 'Error al obtener los departamentos' });
-        } else {
-            res.json(results);
+            console.error('Error al realizar la consulta:', error);
+            res.status(500).json({ error: 'Error al realizar la consulta' });
+            return;
         }
+
+        res.json(results);
     });
 });
 
-// Ruta para obtener las provincias
-app.get('/provincias', (req, res) => {
-    connection.query('SELECT * FROM provincias', (error, results) => {
-        if (error) {
-            console.error('Error al obtener las provincias: ', error);
-            res.status(500).json({ error: 'Error al obtener las provincias' });
-        } else {
-            res.json(results);
-        }
-    });
-});
-
-// Ruta para obtener los distritos
-app.get('/distritos', (req, res) => {
-    connection.query('SELECT * FROM distritos ', (error, results) => {
-        if (error) {
-            console.error('Error al obtener los distritos: ', error);
-            res.status(500).json({ error: 'Error al obtener los distritos' });
-        } else {
-            res.json(results);
-        }
-    });
-});
-
-// Iniciar el servidor
-app.listen(3001, () => {
-    console.log('Servidor iniciado en el puerto 3001');
+app.listen(port, () => {
+    console.log(`Servidor API iniciado en el puerto ${port}`);
 });
